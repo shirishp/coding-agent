@@ -3,7 +3,6 @@ import os
 import sys
 
 MUTATING_TOOLS = {"edit_file", "run_command"}
-session_allowed = set()  # tools the user approved for the whole session
 
 DENIAL_MESSAGE = (
     "The user denied this {tool_name} call. Do not retry the same call. "
@@ -16,7 +15,7 @@ def assume_yes() -> bool:
     return os.environ.get("AGENT_ASSUME_YES") == "1" or not sys.stdin.isatty()
 
 
-def request_permission(call) -> str | None:
+def request_permission(call, session_allowed: set) -> str | None:
     """Return None to allow the call, or a denial string to send back instead."""
     tool_name = call.function.name
     if tool_name not in MUTATING_TOOLS or tool_name in session_allowed:

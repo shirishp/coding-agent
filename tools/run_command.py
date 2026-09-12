@@ -1,7 +1,5 @@
 import subprocess
 
-from coding_agent.sandbox import ROOT
-
 RUN_COMMAND_DEFINITION = {
     "type": "function",
     "function": {
@@ -32,7 +30,7 @@ DEFAULT_TIMEOUT = 30
 MAX_TIMEOUT = 120
 
 
-def run_command(command: str, timeout: int = DEFAULT_TIMEOUT) -> str:
+def run_command(runtime, command: str, timeout: int = DEFAULT_TIMEOUT) -> str:
     if not command.strip():
         return "ERROR: command is empty."
 
@@ -41,7 +39,7 @@ def run_command(command: str, timeout: int = DEFAULT_TIMEOUT) -> str:
         completed = subprocess.run(
             command,
             shell=True,
-            cwd=ROOT,
+            cwd=runtime.root,
             capture_output=True,
             text=True,
             timeout=seconds,

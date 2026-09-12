@@ -1,4 +1,5 @@
-from coding_agent.sandbox import ROOT
+from pathlib import Path
+
 from coding_agent.skills import catalogue_section
 
 AGENTS_MD_NAMES = ("AGENTS.md", "agents.md")
@@ -13,10 +14,10 @@ Keep replies short: lead with the outcome, then only the detail that helps.
 """
 
 
-def agents_md_section() -> str:
+def agents_md_section(root: Path) -> str:
     """Inline AGENTS.md when the project has one. Empty string otherwise."""
     for name in AGENTS_MD_NAMES:
-        path = ROOT / name
+        path = root / name
         if not path.is_file():
             continue
         text = path.read_text().strip()
@@ -33,9 +34,13 @@ def agents_md_section() -> str:
     return ""
 
 
-def build_system_prompt() -> str:
+def build_system_prompt(runtime) -> str:
     return "\n\n".join(
         part
-        for part in (BASE_PROMPT.strip(), agents_md_section(), catalogue_section())
+        for part in (
+            BASE_PROMPT.strip(),
+            agents_md_section(runtime.root),
+            catalogue_section(runtime.skills),
+        )
         if part
     )

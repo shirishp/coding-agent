@@ -1,4 +1,4 @@
-from coding_agent.sandbox import SKIP_DIRS, resolve
+from coding_agent.sandbox import SKIP_DIRS
 
 LIST_FILES_DEFINITION = {
     "type": "function",
@@ -28,8 +28,8 @@ LIST_FILES_DEFINITION = {
 MAX_RECURSIVE_ENTRIES = 200
 
 
-def list_files(path=".", recursive: bool = False) -> str:
-    p = resolve(path)
+def list_files(runtime, path=".", recursive: bool = False) -> str:
+    p = runtime.resolve(path)
     if not p.exists():
         return f"ERROR: {path} does not exist."
     if p.is_file():

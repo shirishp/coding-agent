@@ -1,5 +1,3 @@
-from coding_agent.sandbox import resolve
-
 EDIT_FILE_DEFINITION = {
     "type": "function",
     "function": {
@@ -31,8 +29,8 @@ EDIT_FILE_DEFINITION = {
 }
 
 
-def edit_file(path: str, old_str: str, new_str: str) -> str:
-    target = resolve(path, for_writing=True)
+def edit_file(runtime, path: str, old_str: str, new_str: str) -> str:
+    target = runtime.resolve(path, for_writing=True)
 
     if old_str == "":
         already_existed = target.exists()

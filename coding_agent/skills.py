@@ -2,8 +2,6 @@ import os
 import re
 from pathlib import Path
 
-from coding_agent.sandbox import ROOT
-
 
 def _parse_frontmatter(block: str) -> dict:
     """Parse simple YAML-ish key: value pairs, including indented continuations."""
@@ -44,26 +42,27 @@ def load_catalogue(skills_dir: Path) -> dict:
     return catalogue
 
 
-def catalogue_section() -> str:
+def catalogue_section(skills: dict) -> str:
     """The only part that reaches the system prompt."""
-    if not SKILL_CATALOGUE:
+    if not skills:
         return ""
     listing = "\n".join(
-        f"- {name}: {skill['description']}" for name, skill in SKILL_CATALOGUE.items()
+        f"- {name}: {skill['description']}" for name, skill in skills.items()
     )
     return (
         f"# Available skills\n{listing}\n\nIf a skill covers the task, load it first."
     )
 
 
-def skill_search_path() -> list[Path]:
+def skill_search_path(root: Path) -> list[Path]:
     """User skills first, project skills second, so the project wins a clash."""
     home = Path(os.environ.get("AGENT_HOME", Path.home()))
-    return [home / ".agent" / "skills", ROOT / ".agent" / "skills"]
+    return [home / ".agent" / "skills", root / ".agent" / "skills"]
 
 
-SKILL_CATALOGUE: dict = {}
-
-for directory in skill_search_path():
-    if directory.is_dir():
-        SKILL_CATALOGUE.update(load_catalogue(directory))
+def load_all_skills(root: Path) -> dict:
+    catalogue: dict = {}
+    for directory in skill_search_path(root):
+        if directory.is_dir():
+            catalogue.update(load_catalogue(directory))
+    return catalogue

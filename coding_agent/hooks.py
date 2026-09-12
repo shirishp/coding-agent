@@ -5,7 +5,6 @@ import subprocess
 from pathlib import Path
 
 from coding_agent.permissions import assume_yes
-from coding_agent.sandbox import ROOT
 
 HOOK_TIMEOUT_SECONDS = 5
 
@@ -98,10 +97,10 @@ def run_hooks(config, event, tool_name, tool_input, cwd) -> str | None:
     return None
 
 
-def hook_search_path() -> list[Path]:
+def hook_search_path(root: Path) -> list[Path]:
     """User settings, then project settings. Both contribute; neither can remove the other."""
     home = Path(os.environ.get("AGENT_HOME", Path.home()))
-    return [home / ".agent" / "settings.json", ROOT / ".agent" / "settings.json"]
+    return [home / ".agent" / "settings.json", root / ".agent" / "settings.json"]
 
 
 def confirm(settings_file: Path, config: dict) -> bool:
@@ -119,8 +118,8 @@ def confirm(settings_file: Path, config: dict) -> bool:
         return False
 
 
-def load_all_hooks() -> dict:
-    user_settings, project_settings = hook_search_path()
+def load_all_hooks(root: Path) -> dict:
+    user_settings, project_settings = hook_search_path(root)
     merged: dict = {}
 
     for event, entries in load_hook_config(user_settings).items():
@@ -131,6 +130,3 @@ def load_all_hooks() -> dict:
         for event, entries in project_config.items():
             merged.setdefault(event, []).extend(entries)
     return merged
-
-
-HOOK_CONFIG = load_all_hooks()  # read once, at import

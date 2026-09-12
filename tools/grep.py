@@ -1,7 +1,7 @@
 import fnmatch
 import re
 
-from coding_agent.sandbox import ROOT, SKIP_DIRS, resolve
+from coding_agent.sandbox import SKIP_DIRS
 
 GREP_DEFINITION = {
     "type": "function",
@@ -41,16 +41,16 @@ def _included(path, root, include: str) -> bool:
     return fnmatch.fnmatch(path.name, include) or fnmatch.fnmatch(rel, include)
 
 
-def grep(pattern: str, path: str = ".", glob: str = "*") -> str:
+def grep(runtime, pattern: str, path: str = ".", glob: str = "*") -> str:
     try:
         regex = re.compile(pattern)
     except re.error as error:
         return f"ERROR: invalid regex: {error}"
 
-    target = resolve(path)
+    target = runtime.resolve(path)
     if not target.exists():
         return f"ERROR: {path} does not exist."
-    root = target if target.is_dir() else target.parent
+    search_root = target if target.is_dir() else target.parent
     files = (
         [target]
         if target.is_file()
@@ -60,9 +60,9 @@ def grep(pattern: str, path: str = ".", glob: str = "*") -> str:
     hits = []
     truncated = False
     for file in files:
-        if any(part in SKIP_DIRS for part in file.relative_to(ROOT).parts):
+        if any(part in SKIP_DIRS for part in file.relative_to(runtime.root).parts):
             continue
-        if not _included(file, root, glob):
+        if not _included(file, search_root, glob):
             continue
         if file.stat().st_size > MAX_FILE_BYTES:
             continue
@@ -70,7 +70,7 @@ def grep(pattern: str, path: str = ".", glob: str = "*") -> str:
             text = file.read_text()
         except (UnicodeDecodeError, OSError):
             continue
-        rel = file.relative_to(ROOT)
+        rel = file.relative_to(runtime.root)
         for line_no, line in enumerate(text.splitlines(), start=1):
             if regex.search(line):
                 hits.append(f"{rel}:{line_no}:{line}")

@@ -1,23 +1,25 @@
 import sys
 
-from coding_agent.loop import MODEL, run_agent
+from coding_agent.loop import run_agent
 from coding_agent.prompt import build_system_prompt
+from coding_agent.runtime import Runtime
 
 
 def main() -> None:
+    runtime = Runtime.from_env()
     messages = [
         {
             "role": "system",
-            "content": build_system_prompt(),
+            "content": build_system_prompt(runtime),
         }
     ]
 
     if len(sys.argv) > 1:
         messages.append({"role": "user", "content": " ".join(sys.argv[1:])})
-        print(run_agent(messages))
+        print(run_agent(messages, runtime))
         return
 
-    print(f"harness · {MODEL} · ctrl-d to quit\n")
+    print(f"harness · {runtime.model} · ctrl-d to quit\n")
 
     while True:
         try:
@@ -30,7 +32,7 @@ def main() -> None:
 
         messages.append({"role": "user", "content": user_input})
 
-        print(f"\n{run_agent(messages)}\n")
+        print(f"\n{run_agent(messages, runtime)}\n")
 
 
 if __name__ == "__main__":

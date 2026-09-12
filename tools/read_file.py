@@ -1,5 +1,3 @@
-from coding_agent.sandbox import resolve
-
 READ_FILE_DEFINITION = {
     "type": "function",
     "function": {
@@ -31,8 +29,8 @@ READ_FILE_DEFINITION = {
 }
 
 
-def read_file(path: str, offset: int = 1, limit: int = 0) -> str:
-    lines = resolve(path).read_text().splitlines()
+def read_file(runtime, path: str, offset: int = 1, limit: int = 0) -> str:
+    lines = runtime.resolve(path).read_text().splitlines()
     if not lines:
         return f"(empty file {path})"
 
