@@ -43,6 +43,7 @@ def run_command(runtime, command: str, timeout: int = DEFAULT_TIMEOUT) -> str:
             capture_output=True,
             text=True,
             timeout=seconds,
+            check=False,
         )
     except subprocess.TimeoutExpired:
         return f"ERROR: command timed out after {seconds}s."

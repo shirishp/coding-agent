@@ -30,6 +30,7 @@ def run_once(task, timeout: int = 120) -> dict:
             text=True,
             timeout=timeout,
             env=env,
+            check=False,
         )
 
         passed, reason = task.check(root)

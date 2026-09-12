@@ -61,5 +61,5 @@ def execute_tool(call, runtime, args: dict, extra_dispatch: dict | None = None) 
         return f"ERROR: no such tool {call.function.name!r}"
     try:
         return tool_fn(runtime, **args)
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 - tool failures become model-visible strings
         return f"ERROR: {type(error).__name__}: {error}"

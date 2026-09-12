@@ -62,6 +62,7 @@ def run_hooks(config, event, tool_name, tool_input, cwd) -> str | None:
                 capture_output=True,
                 text=True,
                 timeout=HOOK_TIMEOUT_SECONDS,
+                check=False,
             )
         except subprocess.TimeoutExpired:
             report_broken_hook(command, f"timed out after {HOOK_TIMEOUT_SECONDS}s")

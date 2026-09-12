@@ -12,7 +12,7 @@ def _parse_frontmatter(block: str) -> dict:
         if matched:
             current_key, value = matched.group(1), matched.group(2).strip()
             fields[current_key] = value
-        elif current_key and (line.startswith(" ") or line.startswith("\t")):
+        elif current_key and line.startswith((" ", "\t")):
             continuation = line.strip()
             if continuation:
                 fields[current_key] = f"{fields[current_key]} {continuation}".strip()
