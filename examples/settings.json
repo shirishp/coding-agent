@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "edit_file", "command": ".agent/hooks/protect-lockfiles.sh" }
+    ],
+    "PostToolUse": [
+      { "matcher": "edit_file", "command": ".agent/hooks/log-edits.sh" }
+    ]
+  }
+}

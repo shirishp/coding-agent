@@ -1,0 +1,13 @@
+[project]
+name = "coding-agent"
+version = "0.1.0"
+description = "A local coding-agent harness for testing LLMs"
+readme = "README.md"
+authors = [
+    { name = "Shirish Padalkar", email = "shirish4you@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "openai>=3.2.0",
+    "python-dotenv>=1.2.3",
+]
