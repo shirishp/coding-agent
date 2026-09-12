@@ -4,6 +4,7 @@ from pathlib import Path
 ROOT = Path(os.environ.get("AGENT_ROOT", os.getcwd())).resolve()
 
 PROTECTED_FROM_WRITES = {ROOT / ".agent" / "settings.json"}
+SKIP_DIRS = {".git", ".venv", "__pycache__", "node_modules", ".ruff_cache"}
 
 
 def resolve(path: str, for_writing: bool = False) -> Path:

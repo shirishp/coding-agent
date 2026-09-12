@@ -9,6 +9,6 @@ def truncate_result(result: str) -> str:
     return (
         f"{kept}\n\n"
         f"[Truncated. Showed the first {MAX_TOOL_RESULT_CHARS:,} of {len(result):,} "
-        f"characters; {omitted:,} omitted. To see a later part, call read_file "
-        f"again with an offset.]"
+        f"characters; {omitted:,} omitted. For files, call read_file with offset "
+        f"(1-based line) and limit.]"
     )

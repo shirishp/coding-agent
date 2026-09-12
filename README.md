@@ -6,13 +6,15 @@ sandboxed project root.
 
 ## Features
 
-- **Filesystem tools**: `read_file`, `list_files`, `edit_file`
+- **Filesystem tools**: `read_file`, `list_files`, `grep`, `edit_file`
+- **Shell**: `run_command` (permission-gated; cwd is the project root)
 - **Skills**: load on demand with `load_skill`
 - **Subagents**: `spawn_agent` delegates read-only exploration
 - **Hooks**: project and user shell hooks around tool use
 - **Permissions**: mutating tools need an explicit allow
 - **Turn limit and compaction**: loops cannot run forever
 - **Path sandbox**: tools cannot escape `AGENT_ROOT`
+- **AGENTS.md**: if present at the project root, it is added to the system prompt
 
 ## Installation
 
@@ -67,6 +69,10 @@ chmod +x .agent/hooks/*.sh
 `.agent/` is gitignored. Treat it as local runtime: settings, copied skills, hook
 logs, and subagent transcripts.
 
+If the project root contains `AGENTS.md` (or `agents.md`), its contents are placed
+in the system prompt so the model sees project conventions on every turn. Keep
+that file short; long reference belongs in skills or files the agent can read.
+
 ## Evals
 
 ```
@@ -79,5 +85,5 @@ grades the resulting files. LM Studio must already be running.
 ## Security
 
 - Tools resolve paths inside `AGENT_ROOT` only.
-- `edit_file` requires `y` / `a` unless `AGENT_ASSUME_YES=1` or stdin is not a TTY.
+- `edit_file` and `run_command` require `y` / `a` unless `AGENT_ASSUME_YES=1` or stdin is not a TTY.
 - Project hooks in `.agent/settings.json` run shell commands; the harness asks before enabling them.

@@ -1,17 +1,14 @@
 import sys
 
 from utils.loop import MODEL, run_agent
-from utils.skills import catalogue_section
-
-BASE_PROMPT = "You are a terse coding assistant. Answer in one sentence."
-SYSTEM_PROMPT = "\n\n".join(part for part in [BASE_PROMPT, catalogue_section()] if part)
+from utils.prompt import build_system_prompt
 
 
 def main() -> None:
     messages = [
         {
             "role": "system",
-            "content": SYSTEM_PROMPT,
+            "content": build_system_prompt(),
         }
     ]
 

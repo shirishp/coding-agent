@@ -1,7 +1,8 @@
 import json
-import os, sys
+import os
+import sys
 
-MUTATING_TOOLS = {"edit_file"}
+MUTATING_TOOLS = {"edit_file", "run_command"}
 session_allowed = set()  # tools the user approved for the whole session
 
 DENIAL_MESSAGE = (

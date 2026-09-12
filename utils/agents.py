@@ -2,6 +2,7 @@ import json
 import time
 
 from utils.paths import ROOT
+from utils.prompt import agents_md_section
 
 SPAWN_AGENT = {
     "type": "function",
@@ -31,14 +32,14 @@ SPAWN_AGENT = {
 
 AGENT_TYPES = {
     "explorer": {
-        "tool_names": ("read_file", "list_files"),
+        "tool_names": ("read_file", "list_files", "grep"),
         "max_turns": 12,
         "system_prompt": (
             "You are a read-only explorer working inside a codebase.\n"
             "Investigate, then report. Your reply is the ONLY thing the agent that "
             "called you will see — it cannot read your tool results.\n"
             "Report as a list of 'path:line — what is there' entries, then one "
-            "sentence of summary. Do not describe your process."
+            "sentence of summary."
         ),
     },
 }
@@ -62,8 +63,13 @@ def spawn_agent(task: str, agent_type: str = "explorer") -> str:
         schema for schema in TOOLS if schema["function"]["name"] in config["tool_names"]
     ]
 
+    system_prompt = config["system_prompt"]
+    project_instructions = agents_md_section()
+    if project_instructions:
+        system_prompt = f"{system_prompt}\n\n{project_instructions}"
+
     messages = [
-        {"role": "system", "content": config["system_prompt"]},
+        {"role": "system", "content": system_prompt},
         {"role": "user", "content": task},
     ]
     current_depth += 1
