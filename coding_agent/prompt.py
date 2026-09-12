@@ -1,5 +1,5 @@
-from utils.paths import ROOT
-from utils.skills import catalogue_section
+from coding_agent.sandbox import ROOT
+from coding_agent.skills import catalogue_section
 
 AGENTS_MD_NAMES = ("AGENTS.md", "agents.md")
 AGENTS_MD_CHAR_CAP = 8_000

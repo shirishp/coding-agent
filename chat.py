@@ -1,7 +1,7 @@
 import sys
 
-from utils.loop import MODEL, run_agent
-from utils.prompt import build_system_prompt
+from coding_agent.loop import MODEL, run_agent
+from coding_agent.prompt import build_system_prompt
 
 
 def main() -> None:

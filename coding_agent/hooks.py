@@ -4,8 +4,8 @@ import re
 import subprocess
 from pathlib import Path
 
-from utils.paths import ROOT
-from utils.permissions import assume_yes
+from coding_agent.permissions import assume_yes
+from coding_agent.sandbox import ROOT
 
 HOOK_TIMEOUT_SECONDS = 5
 

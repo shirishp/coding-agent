@@ -2,7 +2,7 @@ import os
 import re
 from pathlib import Path
 
-from utils.paths import ROOT
+from coding_agent.sandbox import ROOT
 
 
 def _parse_frontmatter(block: str) -> dict:

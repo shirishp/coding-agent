@@ -1,11 +1,16 @@
+import json
 import os
+import time
+from functools import partial
 
 from dotenv import load_dotenv
 from openai import OpenAI
 
+from coding_agent.agents import AGENT_TYPES, SPAWN_AGENT
+from coding_agent.compact import COMPACT_ABOVE_TOKENS, compact, estimate_tokens
+from coding_agent.prompt import agents_md_section
+from coding_agent.sandbox import ROOT
 from tools import TOOLS, run_tool
-from utils.agents import SPAWN_AGENT
-from utils.compact import COMPACT_ABOVE_TOKENS, compact, estimate_tokens
 
 load_dotenv()
 
@@ -30,11 +35,41 @@ def offered_tools(base: list, depth: int, skill_loaded: bool) -> list:
     return offered
 
 
+def spawn_agent(task: str, agent_type: str = "explorer", depth: int = 0) -> str:
+    """Run a nested agent. depth is bound by the loop, not by the model."""
+    config = AGENT_TYPES.get(agent_type)
+    if config is None:  # the enum should prevent this; small models ignore enums
+        return (
+            f"ERROR: no agent type {agent_type!r}. Available: {', '.join(AGENT_TYPES)}."
+        )
+
+    tools = [
+        schema for schema in TOOLS if schema["function"]["name"] in config["tool_names"]
+    ]
+
+    system_prompt = config["system_prompt"]
+    project_instructions = agents_md_section()
+    if project_instructions:
+        system_prompt = f"{system_prompt}\n\n{project_instructions}"
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": task},
+    ]
+    result = run_agent(messages, tools, config["max_turns"], depth + 1)
+
+    log_path = ROOT / ".agent" / "subagents" / f"{agent_type}-{int(time.time())}.json"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    log_path.write_text(json.dumps(messages, indent=2, default=str))
+    return result
+
+
 def run_agent(
     messages: list, tools: list = TOOLS, max_turns: int = MAX_TURNS, depth: int = 0
 ) -> str:
     skill_loaded = False  # per-agent now, not a module global
     turns_used = 0
+    extra_dispatch = {"spawn_agent": partial(spawn_agent, depth=depth)}
 
     while turns_used < max_turns:
         turns_used += 1
@@ -59,7 +94,7 @@ def run_agent(
             return reply.content or ""
 
         for call in reply.tool_calls:
-            result = run_tool(call)
+            result = run_tool(call, extra_dispatch)
             print(
                 f"  {'  ' * depth}⚒ {call.function.name}"
                 f"({call.function.arguments}) → {len(result)} chars"

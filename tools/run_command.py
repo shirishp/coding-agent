@@ -1,6 +1,6 @@
 import subprocess
 
-from utils.paths import ROOT
+from coding_agent.sandbox import ROOT
 
 RUN_COMMAND_DEFINITION = {
     "type": "function",

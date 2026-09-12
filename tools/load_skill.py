@@ -1,4 +1,4 @@
-from utils.skills import SKILL_CATALOGUE
+from coding_agent.skills import SKILL_CATALOGUE
 
 LOAD_SKILL_DEFINITION = {
     "type": "function",

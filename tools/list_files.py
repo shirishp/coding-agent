@@ -1,4 +1,4 @@
-from utils.paths import SKIP_DIRS, resolve
+from coding_agent.sandbox import SKIP_DIRS, resolve
 
 LIST_FILES_DEFINITION = {
     "type": "function",

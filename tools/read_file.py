@@ -1,4 +1,4 @@
-from utils.paths import resolve
+from coding_agent.sandbox import resolve
 
 READ_FILE_DEFINITION = {
     "type": "function",

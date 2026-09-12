@@ -1,9 +1,3 @@
-import json
-import time
-
-from utils.paths import ROOT
-from utils.prompt import agents_md_section
-
 SPAWN_AGENT = {
     "type": "function",
     "function": {
@@ -43,42 +37,3 @@ AGENT_TYPES = {
         ),
     },
 }
-
-current_depth = 0
-
-
-def spawn_agent(task: str, agent_type: str = "explorer") -> str:
-    # Intentionally deferred imports to avoid circular dependencies.
-    from tools import TOOLS
-    from utils.loop import run_agent
-
-    global current_depth
-    config = AGENT_TYPES.get(agent_type)
-    if config is None:  # the enum should prevent this; small models ignore enums
-        return (
-            f"ERROR: no agent type {agent_type!r}. Available: {', '.join(AGENT_TYPES)}."
-        )
-
-    tools = [
-        schema for schema in TOOLS if schema["function"]["name"] in config["tool_names"]
-    ]
-
-    system_prompt = config["system_prompt"]
-    project_instructions = agents_md_section()
-    if project_instructions:
-        system_prompt = f"{system_prompt}\n\n{project_instructions}"
-
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": task},
-    ]
-    current_depth += 1
-    try:
-        result = run_agent(messages, tools, config["max_turns"], current_depth)
-    finally:
-        current_depth -= 1
-
-    log_path = ROOT / ".agent" / "subagents" / f"{agent_type}-{int(time.time())}.json"
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-    log_path.write_text(json.dumps(messages, indent=2, default=str))
-    return result

@@ -1,7 +1,7 @@
 import fnmatch
 import re
 
-from utils.paths import ROOT, SKIP_DIRS, resolve
+from coding_agent.sandbox import ROOT, SKIP_DIRS, resolve
 
 GREP_DEFINITION = {
     "type": "function",

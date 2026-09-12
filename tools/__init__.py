@@ -1,16 +1,15 @@
 import json
 
+from coding_agent.hooks import HOOK_CONFIG, run_hooks
+from coding_agent.permissions import request_permission
+from coding_agent.sandbox import ROOT
+from coding_agent.truncate import truncate_result
 from tools.edit_file import EDIT_FILE_DEFINITION, edit_file
 from tools.grep import GREP_DEFINITION, grep
 from tools.list_files import LIST_FILES_DEFINITION, list_files
 from tools.load_skill import LOAD_SKILL_DEFINITION, load_skill
 from tools.read_file import READ_FILE_DEFINITION, read_file
 from tools.run_command import RUN_COMMAND_DEFINITION, run_command
-from utils.agents import spawn_agent
-from utils.hooks import HOOK_CONFIG, run_hooks
-from utils.paths import ROOT
-from utils.permissions import request_permission
-from utils.truncate import truncate_result
 
 TOOLS = [
     READ_FILE_DEFINITION,
@@ -27,11 +26,10 @@ DISPATCH = {
     "edit_file": edit_file,
     "run_command": run_command,
     "load_skill": load_skill,
-    "spawn_agent": spawn_agent,
 }
 
 
-def run_tool(call) -> str:
+def run_tool(call, extra_dispatch: dict | None = None) -> str:
     tool_name = call.function.name
     try:
         tool_input = json.loads(call.function.arguments)
@@ -45,13 +43,14 @@ def run_tool(call) -> str:
     denial = request_permission(call)
     if denial is not None:
         return denial
-    result = truncate_result(execute_tool(call, tool_input))
+    result = truncate_result(execute_tool(call, tool_input, extra_dispatch))
     run_hooks(HOOK_CONFIG, "PostToolUse", tool_name, tool_input, ROOT)
     return result
 
 
-def execute_tool(call, args: dict) -> str:
-    tool_fn = DISPATCH.get(call.function.name)
+def execute_tool(call, args: dict, extra_dispatch: dict | None = None) -> str:
+    dispatch = DISPATCH if extra_dispatch is None else {**DISPATCH, **extra_dispatch}
+    tool_fn = dispatch.get(call.function.name)
     if tool_fn is None:
         return f"ERROR: no such tool {call.function.name!r}"
     try:
